@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const feedback = document.getElementById("feedback");
   const promptText = document.getElementById("prompt");
   const countdown = document.getElementById("countdown");
-  const downloadBtn = document.getElementById("download");
 
   let device = "";
   let testIndex = 0;
@@ -17,8 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let noClickTimer = null;
 
   let results = [];
-  let correct = 0;
-  let missed = 0;
 
   const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
 
@@ -95,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
       box.style.top = "50%";
       box.style.transform = "translate(-50%, -50%) scale(1)";
     } else {
-      box.style.transform = "scale(1)";
       box.style.left = Math.random() * (innerWidth - 120) + "px";
       box.style.top = Math.random() * (innerHeight - 120) + "px";
     }
@@ -107,9 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!shouldClick) {
         noClickTimer = setTimeout(() => {
-          correct++;
           feedback.textContent = "Correct (no click)";
-          animateFeedback();
           advance();
         }, 5000);
       }
@@ -123,27 +117,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!canClick) return;
 
     if (!shouldClick) {
-      missed++;
       feedback.textContent = "Wrong click";
-      animateFeedback();
       advance();
       return;
     }
 
     const time = Date.now() - startTime;
-    correct++;
     results.push({ time });
-
     feedback.textContent = `${time} ms`;
-    animateFeedback();
     advance();
   };
-
-  function animateFeedback() {
-    feedback.style.animation = "none";
-    feedback.offsetHeight;
-    feedback.style.animation = "pop 0.25s ease";
-  }
 
   function advance() {
     trial++;
@@ -165,9 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
     feedback.textContent = "Experiment Complete";
     restartBtn.style.display = "block";
 
-    if (results.length === 0) return;
+    if (!results.length) return;
 
-    const name = prompt("Enter your name for the leaderboard:");
+    const name = prompt("Enter your name:");
     if (!name) return;
 
     const avg = Math.round(results.reduce((a, b) => a + b.time, 0) / results.length);
@@ -182,12 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resetExperiment() {
-    device = "";
     testIndex = 0;
     trial = 0;
     results = [];
-    correct = 0;
-    missed = 0;
     deviceSelect.style.display = "block";
     startBtn.style.display = "none";
     restartBtn.style.display = "none";
