@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let canClick = false;
   let shouldClick = true;
   let results = [];
+  let deviceName = "";
+  let totalTrials = 0;
+  let correctTrials = 0;
 
   const tests = ["center", "random", "color"];
   const colors = ["red", "orange", "yellow", "green", "blue"];
@@ -20,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Device selection
   document.querySelectorAll(".deviceBtn").forEach(btn => {
     btn.onclick = () => {
+      deviceName = btn.dataset.device;
       deviceSelect.style.display = "none";
       startBtn.style.display = "inline-block";
     };
@@ -53,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
-  // Next trial
   function nextTrial() {
     canClick = false;
     hideBox();
@@ -63,61 +66,92 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       spawnBox();
       startTime = Date.now();
-      canClick = true;
     }, Math.random() * 1500 + 1000);
   }
 
-  // Smooth hide box
   function hideBox() {
     box.classList.remove("show");
     setTimeout(() => box.style.display = "none", 400);
   }
 
-  // Spawn reaction box
+  function getTestName(testCode) {
+    switch (testCode) {
+      case "center": return "Center Reaction";
+      case "random": return "Random Position";
+      case "color": return "Color Recognition";
+      default: return testCode;
+    }
+  }
+
   function spawnBox() {
     box.style.display = "block";
     box.classList.add("show");
 
     const mode = tests[testIndex];
 
+    // CENTER
     if (mode === "center") {
       box.style.left = "50%";
       box.style.top = "50%";
       box.style.transform = "translate(-50%, -50%) scale(1)";
       box.style.background = "green";
       shouldClick = true;
+      canClick = true;
     }
 
+    // RANDOM
     if (mode === "random") {
       box.style.left = Math.random() * (innerWidth - 120) + "px";
       box.style.top = Math.random() * (innerHeight - 120) + "px";
       box.style.background = "green";
       shouldClick = true;
+      canClick = true;
     }
 
+    // COLOR
     if (mode === "color") {
-      box.style.left = "50%";
-      box.style.top = "50%";
-      box.style.transform = "translate(-50%, -50%) scale(1)";
+      box.style.left = Math.random() * (innerWidth - 120) + "px"; // random position
+      box.style.top = Math.random() * (innerHeight - 120) + "px";
       const color = colors[Math.floor(Math.random() * colors.length)];
       box.style.background = color;
       shouldClick = Math.random() > 0.5;
       promptText.textContent = shouldClick ? "CLICK" : "DON'T CLICK";
+
+      if (!shouldClick) {
+        canClick = false;
+        setTimeout(() => {
+          feedback.textContent = "Good, you didn't click!";
+          correctTrials++;
+          hideBox();
+          advance();
+        }, 5000);
+      } else {
+        canClick = true;
+      }
     }
   }
 
   box.onclick = () => {
     if (!canClick) return;
 
+    totalTrials++;
+
     if (!shouldClick) {
       feedback.textContent = "Wrong!";
+      hideBox();
       advance();
       return;
     }
 
     const time = Date.now() - startTime;
-    results.push(time);
+    results.push({
+      device: deviceName,
+      test: tests[testIndex],
+      trial: trial + 1,
+      time: time
+    });
     feedback.textContent = `${time} ms`;
+    correctTrials++;
     advance();
   };
 
@@ -140,7 +174,12 @@ document.addEventListener("DOMContentLoaded", () => {
     hideBox();
     feedback.textContent = "Experiment complete";
 
-    const avg = Math.round(results.reduce((a, b) => a + b, 0) / results.length);
+    const times = results.map(r => r.time);
+    const avg = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+    const best = times.length ? Math.min(...times) : 0;
+    const worst = times.length ? Math.max(...times) : 0;
+    const accuracy = totalTrials ? Math.round((correctTrials / totalTrials) * 100) : 100;
+
     const name = prompt("Enter your name:");
     if (!name) return;
 
@@ -164,12 +203,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // DOWNLOAD CSV
   downloadBtn.onclick = () => {
-    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-    if (!leaderboard.length) return alert("No data");
+    if (!results.length) return alert("No data");
 
-    let csv = "Name,Avg(ms)\n";
-    leaderboard.forEach(e => csv += `${e.name},${e.avg}\n`);
+    let csv = "Device,Test,Trial,Reaction Time (ms)\n";
+    results.forEach(r => {
+      csv += `${r.device},${getTestName(r.test)},${r.trial},${r.time}\n`;
+    });
+
+    const times = results.map(r => r.time);
+    const avg = times.length ? Math.round(times.reduce((a,b)=>a+b,0)/times.length) : 0;
+    const best = times.length ? Math.min(...times) : 0;
+    const worst = times.length ? Math.max(...times) : 0;
+    const accuracy = totalTrials ? Math.round((correctTrials / totalTrials) * 100) : 100;
+
+    csv += `\nAVERAGE,,,\t${avg}\n`;
+    csv += `BEST (Fastest),,,\t${best}\n`;
+    csv += `WORST (Slowest),,,\t${worst}\n`;
+    csv += `ACCURACY,,,\t${accuracy}%\n`;
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -182,3 +234,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderLeaderboard();
 });
+
