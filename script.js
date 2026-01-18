@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const feedback = document.getElementById("feedback");
   const promptText = document.getElementById("prompt");
   const countdown = document.getElementById("countdown");
+  const downloadBtn = document.getElementById("download");
 
   let device = "";
   let testIndex = 0;
@@ -50,15 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function startCountdown() {
     let c = 3;
     countdown.textContent = c;
-    countdown.style.animation = "pulse 0.6s ease";
 
     const timer = setInterval(() => {
       c--;
       countdown.textContent = c > 0 ? c : "";
-      countdown.style.animation = "none";
-      countdown.offsetHeight;
-      countdown.style.animation = "pulse 0.6s ease";
-
       if (c === 0) {
         clearInterval(timer);
         nextTrial();
@@ -185,5 +181,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 📊 DOWNLOAD CSV
+  downloadBtn.addEventListener("click", () => {
+    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    if (!leaderboard.length) {
+      alert("No data to download");
+      return;
+    }
+
+    let csv = "Name,Average Reaction Time (ms)\n";
+    leaderboard.forEach(e => {
+      csv += `${e.name},${e.avg}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "reaction_times.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
   renderLeaderboard();
 });
+
+
+  renderLeaderboard();
+});
+
