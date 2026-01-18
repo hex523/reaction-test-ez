@@ -1,6 +1,3 @@
-/* =========================
-   GLOBAL STYLES
-========================= */
 body {
   margin: 0;
   background: #111;
@@ -8,41 +5,22 @@ body {
   font-family: 'Press Start 2P', monospace;
   text-align: center;
   overflow: hidden;
-  font-size: 14px;
-  -webkit-font-smoothing: none;
 }
 
-/* =========================
-   BUTTONS (ALL)
-========================= */
 button {
   padding: 10px 16px;
   margin: 6px;
-  font-size: 14px;
   cursor: pointer;
-  border-radius: 0;
   background: #333;
   color: white;
   border: 2px solid white;
-  letter-spacing: 1px;
-  line-height: 1.4;
-  text-transform: uppercase;
   font-family: 'Press Start 2P', monospace;
-  transition: transform 0.15s ease, background 0.2s ease;
 }
 
 button:hover {
-  transform: scale(1.05);
   background: #555;
 }
 
-button:active {
-  transform: scale(0.95);
-}
-
-/* =========================
-   REACTION BOX
-========================= */
 #box {
   width: 120px;
   height: 120px;
@@ -59,80 +37,28 @@ button:active {
   transform: scale(1);
 }
 
-/* =========================
-   TEXT UI
-========================= */
-#prompt {
-  font-size: 20px;
-  margin: 12px;
-}
-
 #countdown {
   font-size: 42px;
-  margin: 10px;
 }
 
-#feedback {
-  margin-top: 10px;
-  animation: pop 0.25s ease;
+#prompt {
+  font-size: 20px;
 }
 
-/* =========================
-   DOWNLOAD BUTTON
-========================= */
 #download {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  font-size: 18px;
 }
 
-/* =========================
-   LEADERBOARD
-========================= */
 #leaderboard {
   position: fixed;
   top: 80px;
   left: 20px;
   background: #222;
-  padding: 12px 16px;
+  padding: 12px;
   border: 2px solid white;
   width: 240px;
   text-align: left;
-  font-size: 12px;
 }
 
-#leaderboard h2 {
-  text-align: center;
-  margin-top: 0;
-  font-size: 14px;
-}
-
-#leaderboard li {
-  animation: slideIn 0.3s ease;
-}
-
-/* =========================
-   ANIMATIONS
-========================= */
-@keyframes pop {
-  from {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
