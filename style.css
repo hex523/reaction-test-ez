@@ -1,3 +1,6 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
 body {
   margin: 0;
   background: #111;
@@ -9,6 +12,9 @@ body {
   -webkit-font-smoothing: none;
 }
 
+/* =========================
+   BUTTONS (ALL)
+========================= */
 button {
   padding: 10px 16px;
   margin: 6px;
@@ -19,12 +25,24 @@ button {
   color: white;
   border: 2px solid white;
   letter-spacing: 1px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  font-family: 'Press Start 2P', monospace;
   transition: transform 0.15s ease, background 0.2s ease;
 }
 
-button:hover { transform: scale(1.05); background: #555; }
-button:active { transform: scale(0.95); }
+button:hover {
+  transform: scale(1.05);
+  background: #555;
+}
 
+button:active {
+  transform: scale(0.95);
+}
+
+/* =========================
+   REACTION BOX
+========================= */
 #box {
   width: 120px;
   height: 120px;
@@ -41,6 +59,9 @@ button:active { transform: scale(0.95); }
   transform: scale(1);
 }
 
+/* =========================
+   TEXT UI
+========================= */
 #prompt {
   font-size: 20px;
   margin: 12px;
@@ -51,6 +72,14 @@ button:active { transform: scale(0.95); }
   margin: 10px;
 }
 
+#feedback {
+  margin-top: 10px;
+  animation: pop 0.25s ease;
+}
+
+/* =========================
+   DOWNLOAD BUTTON
+========================= */
 #download {
   position: fixed;
   bottom: 20px;
@@ -58,21 +87,9 @@ button:active { transform: scale(0.95); }
   font-size: 18px;
 }
 
-@keyframes pop {
-  from { transform: scale(1.4); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-#feedback {
-  animation: pop 0.25s ease;
-  margin-top: 10px;
-}
-
-@keyframes pulse {
-  from { transform: scale(1.6); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
+/* =========================
+   LEADERBOARD
+========================= */
 #leaderboard {
   position: fixed;
   top: 80px;
@@ -95,7 +112,27 @@ button:active { transform: scale(0.95); }
   animation: slideIn 0.3s ease;
 }
 
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes pop {
+  from {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
