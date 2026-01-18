@@ -1,3 +1,6 @@
+/* =========================
+   GLOBAL
+========================= */
 body {
   margin: 0;
   background: #111;
@@ -5,6 +8,7 @@ body {
   font-family: 'Press Start 2P', monospace;
   text-align: center;
   overflow: hidden;
+  -webkit-font-smoothing: none;
 }
 
 button {
@@ -15,12 +19,39 @@ button {
   color: white;
   border: 2px solid white;
   font-family: 'Press Start 2P', monospace;
+  transition: transform 0.15s ease, background 0.2s ease;
 }
 
 button:hover {
+  transform: scale(1.05);
   background: #555;
 }
 
+button:active {
+  transform: scale(0.95);
+}
+
+/* =========================
+   TEXT
+========================= */
+#countdown {
+  font-size: 42px;
+  margin: 10px;
+}
+
+#prompt {
+  font-size: 20px;
+  margin: 12px;
+}
+
+#feedback {
+  margin-top: 10px;
+  animation: pop 0.25s ease;
+}
+
+/* =========================
+   REACTION BOX
+========================= */
 #box {
   width: 120px;
   height: 120px;
@@ -37,28 +68,72 @@ button:hover {
   transform: scale(1);
 }
 
-#countdown {
-  font-size: 42px;
-}
-
-#prompt {
-  font-size: 20px;
-}
-
-#download {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-}
-
+/* =========================
+   LEADERBOARD
+========================= */
 #leaderboard {
   position: fixed;
   top: 80px;
   left: 20px;
   background: #222;
-  padding: 12px;
+  padding: 12px 16px;
   border: 2px solid white;
   width: 240px;
   text-align: left;
+  font-size: 12px;
+  overflow: hidden;
 }
 
+#leaderboard h2 {
+  text-align: center;
+  margin-top: 0;
+  font-size: 14px;
+}
+
+#leaderboard ol {
+  padding-left: 18px;
+  margin: 0;
+}
+
+#leaderboard li {
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: slideIn 0.3s ease;
+}
+
+/* =========================
+   DOWNLOAD BUTTON
+========================= */
+#download {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 18px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes pop {
+  from {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
