@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("script loaded");
 
   const box = document.getElementById("box");
   const startBtn = document.getElementById("startBtn");
@@ -8,36 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const countdown = document.getElementById("countdown");
   const downloadBtn = document.getElementById("download");
 
-  let device = "";
   let testIndex = 0;
   let trial = 0;
   let startTime = 0;
   let canClick = false;
-  let shouldClick = false;
-  let noClickTimer = null;
-
+  let shouldClick = true;
   let results = [];
 
-  const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
-
-  const tests = [
-    { name: "Center Reaction", mode: "center" },
-    { name: "Random Position", mode: "random" },
-    { name: "Color Recognition", mode: "color" }
-  ];
-
-  const restartBtn = document.createElement("button");
-  restartBtn.textContent = "🔄 Restart";
-  restartBtn.style.position = "fixed";
-  restartBtn.style.top = "15px";
-  restartBtn.style.right = "15px";
-  restartBtn.style.display = "none";
-  document.body.appendChild(restartBtn);
-  restartBtn.onclick = resetExperiment;
+  const tests = ["center", "random", "color"];
+  const colors = ["red", "orange", "yellow", "green", "blue"];
 
   document.querySelectorAll(".deviceBtn").forEach(btn => {
     btn.onclick = () => {
-      device = btn.dataset.device;
       deviceSelect.style.display = "none";
       startBtn.style.display = "inline-block";
     };
@@ -64,8 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function nextTrial() {
     canClick = false;
-    clearTimeout(noClickTimer);
-    box.classList.remove("show");
     box.style.display = "none";
     promptText.textContent = "";
     feedback.textContent = "";
@@ -78,34 +59,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function spawnBox() {
-    const test = tests[testIndex];
     box.style.display = "block";
-    box.classList.remove("show");
-    requestAnimationFrame(() => box.classList.add("show"));
+    box.classList.add("show");
 
-    if (test.mode === "center") {
+    const mode = tests[testIndex];
+
+    if (mode === "center") {
       box.style.left = "50%";
       box.style.top = "50%";
       box.style.transform = "translate(-50%, -50%) scale(1)";
-    } else {
-      box.style.left = Math.random() * (innerWidth - 120) + "px";
-      box.style.top = Math.random() * (innerHeight - 120) + "px";
-    }
-
-    if (test.mode === "color") {
-      box.style.background = colors[Math.floor(Math.random() * colors.length)];
-      shouldClick = Math.random() > 0.5;
-      promptText.textContent = shouldClick ? "CLICK" : "DON'T CLICK";
-
-      if (!shouldClick) {
-        noClickTimer = setTimeout(() => {
-          feedback.textContent = "Correct (no click)";
-          advance();
-        }, 5000);
-      }
-    } else {
       box.style.background = "green";
       shouldClick = true;
+    }
+
+    if (mode === "random") {
+      box.style.left = Math.random() * (innerWidth - 120) + "px";
+      box.style.top = Math.random() * (innerHeight - 120) + "px";
+      box.style.background = "green";
+      shouldClick = true;
+    }
+
+    if (mode === "color") {
+      box.style.left = "50%";
+      box.style.top = "50%";
+      box.style.transform = "translate(-50%, -50%) scale(1)";
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      box.style.background = color;
+      shouldClick = Math.random() > 0.5;
+      promptText.textContent = shouldClick ? "CLICK" : "DON'T CLICK";
     }
   }
 
@@ -113,13 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!canClick) return;
 
     if (!shouldClick) {
-      feedback.textContent = "Wrong click";
+      feedback.textContent = "Wrong!";
       advance();
       return;
     }
 
     const time = Date.now() - startTime;
-    results.push({ time });
+    results.push(time);
     feedback.textContent = `${time} ms`;
     advance();
   };
@@ -141,33 +122,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function endExperiment() {
     box.style.display = "none";
-    feedback.textContent = "Experiment Complete";
-    restartBtn.style.display = "block";
+    feedback.textContent = "Experiment complete";
 
-    if (!results.length) return;
-
+    const avg = Math.round(results.reduce((a, b) => a + b, 0) / results.length);
     const name = prompt("Enter your name:");
     if (!name) return;
 
-    const avg = Math.round(results.reduce((a, b) => a + b.time, 0) / results.length);
     let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-
-    leaderboard.push({ name: name.substring(0, 12), avg });
+    leaderboard.push({ name, avg });
     leaderboard.sort((a, b) => a.avg - b.avg);
     leaderboard = leaderboard.slice(0, 10);
 
     localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
     renderLeaderboard();
-  }
-
-  function resetExperiment() {
-    testIndex = 0;
-    trial = 0;
-    results = [];
-    deviceSelect.style.display = "block";
-    startBtn.style.display = "none";
-    restartBtn.style.display = "none";
-    feedback.textContent = "";
   }
 
   function renderLeaderboard() {
@@ -181,33 +148,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 📊 DOWNLOAD CSV
-  downloadBtn.addEventListener("click", () => {
+  downloadBtn.onclick = () => {
     const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-    if (!leaderboard.length) {
-      alert("No data to download");
-      return;
-    }
+    if (!leaderboard.length) return alert("No data");
 
-    let csv = "Name,Average Reaction Time (ms)\n";
-    leaderboard.forEach(e => {
-      csv += `${e.name},${e.avg}\n`;
-    });
+    let csv = "Name,Avg(ms)\n";
+    leaderboard.forEach(e => csv += `${e.name},${e.avg}\n`);
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = "reaction_times.csv";
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  });
+  };
 
   renderLeaderboard();
 });
-
-
-
