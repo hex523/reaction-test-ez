@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("script loaded");
-
   const box = document.getElementById("box");
   const startBtn = document.getElementById("startBtn");
   const deviceSelect = document.getElementById("deviceSelect");
@@ -19,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tests = ["center", "random", "color"];
   const colors = ["red", "orange", "yellow", "green", "blue"];
 
+  // Device selection
   document.querySelectorAll(".deviceBtn").forEach(btn => {
     btn.onclick = () => {
       deviceSelect.style.display = "none";
@@ -31,23 +30,33 @@ document.addEventListener("DOMContentLoaded", () => {
     startCountdown();
   };
 
+  // Smooth countdown
   function startCountdown() {
     let c = 3;
-    countdown.textContent = c;
 
+    function showCountdown(num) {
+      if (num <= 0) {
+        countdown.textContent = "";
+        nextTrial();
+        return;
+      }
+      countdown.textContent = num;
+      countdown.classList.add("show");
+      setTimeout(() => countdown.classList.remove("show"), 500);
+    }
+
+    showCountdown(c);
     const timer = setInterval(() => {
       c--;
-      countdown.textContent = c > 0 ? c : "";
-      if (c === 0) {
-        clearInterval(timer);
-        nextTrial();
-      }
+      showCountdown(c);
+      if (c <= 0) clearInterval(timer);
     }, 1000);
   }
 
+  // Next trial
   function nextTrial() {
     canClick = false;
-    box.style.display = "none";
+    hideBox();
     promptText.textContent = "";
     feedback.textContent = "";
 
@@ -58,6 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }, Math.random() * 1500 + 1000);
   }
 
+  // Smooth hide box
+  function hideBox() {
+    box.classList.remove("show");
+    setTimeout(() => box.style.display = "none", 400);
+  }
+
+  // Spawn reaction box
   function spawnBox() {
     box.style.display = "block";
     box.classList.add("show");
@@ -121,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function endExperiment() {
-    box.style.display = "none";
+    hideBox();
     feedback.textContent = "Experiment complete";
 
     const avg = Math.round(results.reduce((a, b) => a + b, 0) / results.length);
