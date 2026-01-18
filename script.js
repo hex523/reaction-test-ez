@@ -210,6 +210,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-  renderLeaderboard();
-});
 
